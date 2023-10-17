@@ -1,0 +1,29 @@
+version: '3.1'
+
+services:
+
+  mariadb:
+    image: mysql:8.0.33
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD_HASH: ""
+      MYSQL_USER: root
+      MYSQL_PASSWORD_HASH: "*97E7471D816A37E38510728AEA47440F9C6E2585"
+      MYSQL_DATABASE: spring
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    expose: 
+      - 3306
+
+  spring:
+    build: .
+    container_name: spring
+    ports:
+      - 8080:8080
+    depends_on:
+      mysql:
+        condition: service_healthy
+
